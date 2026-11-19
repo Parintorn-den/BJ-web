@@ -3,188 +3,108 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ติดตามสถานะเรือ (Google Sheets) | B.J. Interfreight</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
+<title>ติดตามสถานะเรือ | B.J. Interfreight</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600&display=swap">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
-:root{--bg:#e9eff2;--paper:#f6f9fa;--ink:#102a43;--mute:#52667a;--line:#b9cbd6;--sea:#cfdfe7;--route:#1f6f8b;--amber:#d98e04;--amber-bg:#fff3d1;--ok:#1b7a4b;--err:#b42318;--grid:#c5d6df;
+:root{--bg:#e9eff2;--paper:#f6f9fa;--ink:#102a43;--mute:#52667a;--line:#b9cbd6;--route:#1f6f8b;--amber:#d98e04;--amber-bg:#fff3d1;--ok:#1b7a4b;--err:#b42318;
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1b2a;--paper:#13263a;--ink:#e6eef5;--mute:#9db1c3;--line:#2c4560;--sea:#1b3550;--route:#5bb5d1;--amber:#f0b429;--amber-bg:#3a2e0f;--ok:#4cc38a;--err:#ff8a7a;--grid:#1f3a54}}
-:root[data-theme="dark"]{--bg:#0d1b2a;--paper:#13263a;--ink:#e6eef5;--mute:#9db1c3;--line:#2c4560;--sea:#1b3550;--route:#5bb5d1;--amber:#f0b429;--amber-bg:#3a2e0f;--ok:#4cc38a;--err:#ff8a7a;--grid:#1f3a54}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
-*{box-sizing:border-box}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1b2a;--paper:#13263a;--ink:#e6eef5;--mute:#9db1c3;--line:#2c4560;--route:#5bb5d1;--amber:#f0b429;--amber-bg:#3a2e0f;--ok:#4cc38a;--err:#ff8a7a}}
+:root[data-theme="dark"]{--bg:#0d1b2a;--paper:#13263a;--ink:#e6eef5;--mute:#9db1c3;--line:#2c4560;--route:#5bb5d1;--amber:#f0b429;--amber-bg:#3a2e0f;--ok:#4cc38a;--err:#ff8a7a}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}*{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.6 "IBM Plex Sans Thai",system-ui,sans-serif}
-.wrap{max-width:980px;margin:0 auto;padding:20px 16px 48px}
-header{display:flex;align-items:baseline;justify-content:space-between;gap:12px;border-bottom:2px solid var(--ink);padding-bottom:10px}
-.brand{font-weight:600;font-size:18px;letter-spacing:.01em}
-.brand small{font-weight:400;color:var(--mute);margin-left:8px}
-h1{font-size:clamp(28px,5vw,44px);line-height:1.2;margin:28px 0 6px;font-weight:600}
-.lead{color:var(--mute);margin:0 0 22px;max-width:60ch}
-form{background:var(--paper);border:1px solid var(--line);padding:18px;display:grid;gap:14px;grid-template-columns:repeat(3,1fr)}
+.wrap{max-width:900px;margin:0 auto;padding:20px 16px 48px}
+header{display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px solid var(--ink);padding-bottom:10px;font-weight:600;font-size:18px}
+header small{font-weight:400;color:var(--mute);font-size:14px}
+h1{font-size:clamp(28px,5vw,42px);line-height:1.2;margin:26px 0 6px;font-weight:600}
+.lead{color:var(--mute);margin:0 0 20px;max-width:60ch}
+form{background:var(--paper);border:1px solid var(--line);padding:18px;display:grid;gap:14px;grid-template-columns:1fr}
 @media(max-width:720px){form{grid-template-columns:1fr}}
 label{display:grid;gap:4px;font-weight:500;font-size:14px}
 input{font:inherit;padding:10px 12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:2px}
-input:focus-visible,button:focus-visible{outline:3px solid var(--amber);outline-offset:1px}
-.actions{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+input:focus-visible,button:focus-visible,a:focus-visible{outline:3px solid var(--amber);outline-offset:1px}
+.actions{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 button{font:inherit;cursor:pointer}
 .go{background:var(--ink);color:var(--bg);border:0;padding:11px 22px;font-weight:600;border-radius:2px}
-.demo{color:var(--mute);font-size:14px}
-.demo button{background:none;border:1px solid var(--line);color:var(--ink);padding:3px 10px;margin-left:6px;border-radius:99px;font-size:13px}
-.pick{background:var(--paper);color:var(--ink);border:1px solid var(--line);padding:8px 14px;border-radius:2px}
+.pick{background:var(--paper);color:var(--ink);border:1px solid var(--line);padding:6px 12px;border-radius:2px;font-size:14px}
 .err{color:var(--err);font-weight:500;margin:14px 0 0}
-#result{margin-top:28px}
-.status{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;justify-content:space-between;padding:14px 18px;background:var(--paper);border:1px solid var(--line);border-left:6px solid var(--route)}
-.status.dark{border-left-color:var(--amber)}
-.status.docked{border-left-color:var(--ok)}
-.status h2{margin:0;font-size:20px}
-.status p{margin:0;color:var(--mute);font-size:14px}
-.meta{display:flex;flex-wrap:wrap;gap:4px 22px;color:var(--mute);font-size:14px;margin:12px 0}
-.meta b{color:var(--ink);font-weight:500}
-.chart{margin-top:6px;background:var(--sea);border:1px solid var(--line);overflow-x:auto}
-.chart svg{display:block;min-width:620px;width:100%;height:auto}
-.legs{margin-top:14px;overflow-x:auto;background:var(--paper);border:1px solid var(--line)}
-table{border-collapse:collapse;width:100%;min-width:640px;font-size:14px}
-th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:top}
-th{font-weight:600;color:var(--mute);font-size:13px}
-tr:last-child td{border-bottom:0}
+.note{color:var(--mute);font-size:13px;margin:8px 0 0}
+.status{margin-top:26px;padding:14px 18px;background:var(--paper);border:1px solid var(--line);border-left:6px solid var(--route)}
+.status.done{border-left-color:var(--ok)}.status.wait{border-left-color:var(--amber)}
+.status h2{margin:0;font-size:21px}.status p{margin:2px 0 0;color:var(--mute);font-size:14px}
+.meta{margin:12px 0;color:var(--mute);font-size:14px}.meta b{color:var(--ink);font-weight:500}
+.tl{margin:18px 0 0 10px;border-left:3px solid var(--line)}
+.node{position:relative;padding:2px 0 2px 24px;font-weight:600}
+.node::before{content:"";position:absolute;left:-11px;top:8px;width:16px;height:16px;border-radius:50%;background:var(--paper);border:3px solid var(--route)}
+.node.on::before{background:var(--route)}
+.seg{margin:6px 0 6px 24px;padding:10px 14px;background:var(--paper);border:1px solid var(--line);border-left:5px solid var(--line);font-size:14px}
+.seg.done{border-left-color:var(--ok)}.seg.go{border-left-color:var(--amber)}.seg.over{border-left-color:var(--err)}
+.seg .v{font-weight:600;font-size:15px}
+.badge{display:inline-block;font-size:12px;padding:0 8px;border:1px solid var(--line);border-radius:99px;color:var(--mute);margin-right:6px}
+.row{display:flex;flex-wrap:wrap;gap:2px 22px;margin-top:4px}
 .tag{display:inline-block;font-size:12px;padding:0 7px;border-radius:99px;border:1px solid var(--line);margin-left:6px;color:var(--mute)}
 .tag.ok{border-color:var(--ok);color:var(--ok)}
-.remark{margin-top:16px;padding:12px 16px;background:var(--amber-bg);border-left:6px solid var(--amber);font-size:14px}
-.note{margin-top:30px;color:var(--mute);font-size:13px}
-@media (prefers-reduced-motion:no-preference){.ping{animation:ping 2.2s ease-out infinite;transform-origin:center;transform-box:fill-box}@keyframes ping{from{transform:scale(.6);opacity:.9}to{transform:scale(2.6);opacity:0}}}
+.seg a{color:var(--route);font-size:13px}
+.remark{margin-top:18px;padding:12px 16px;background:var(--amber-bg);border-left:6px solid var(--amber);font-size:14px}
+.seg{margin:8px 0}.seg p{font-size:14px}.seg a{color:var(--route)}
 </style>
 </head>
 <body>
 <div class="wrap">
-<header><div class="brand">B.J. Interfreight<small>Vessel Status</small></div><span class="demo">เวอร์ชันต้นแบบ</span></header>
+<header><span>B.J. Interfreight</span><small>Vessel Status</small></header>
 <h1>เรือของคุณอยู่ตรงไหนแล้ว</h1>
-<p class="lead">กรอกเลข Booking ชื่อเรือ หรือชื่อบริษัท อย่างใดอย่างหนึ่งหรือหลายอย่างก็ได้ เพื่อดูตำแหน่งและกำหนดการเรือที่บรรทุกตู้สินค้าของคุณ</p>
+<p class="lead">กรอกเลข Booking ให้ตรงกับเอกสารการจอง เพื่อดูเส้นทางและกำหนดการเรือที่บรรทุกตู้สินค้าของคุณ</p>
 <form id="f" novalidate>
-<label>เลข Booking<input id="bk" autocomplete="off" placeholder="เช่น BJI26110481"></label>
-<label>ชื่อเรือ<input id="vs" autocomplete="off" placeholder="เช่น ULANGA"></label>
-<label>ชื่อบริษัท<input id="co" autocomplete="off" placeholder="เช่น Kaew Trading Co., Ltd."></label>
-<div class="actions"><button class="go" type="submit">ตรวจสอบสถานะ</button>
-<button type="button" class="pick" id="rf">อัปเดตข้อมูลล่าสุด</button><button type="button" class="pick" id="upbtn">เลือกไฟล์ Excel</button><input type="file" id="xl" accept=".xlsx,.xls" hidden><span class="demo" id="demo"></span></div>
+<label>เลข Booking<input id="bk" autocomplete="off" required></label>
+<div class="actions"><button class="go" id="go" type="submit">ตรวจสอบสถานะ</button></div>
 </form>
-<p class="note" id="src" style="margin:8px 0 0"></p>
 <div id="msg"></div>
 <div id="result" aria-live="polite"></div>
-<p class="note">ข้อมูลในหน้านี้อ่านจาก Google Sheets ซึ่งเป็นข้อมูลจำลองสำหรับทดสอบ ยังไม่ได้เชื่อมต่อแหล่งข้อมูลเรือจริง</p>
 </div>
 <script>
-var DB=[],XL="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";
-var SHEET_ID="1pmknpj02oxoHVmWxal3YrjTzoGul6O4u3uQixlt8vL8";
-function csv(t){var rows=[],r=[],f="",q=false;
- for(var i=0;i<t.length;i++){var c=t[i];
-  if(q){if(c=='"'){if(t[i+1]=='"'){f+='"';i++}else q=false}else f+=c}
-  else if(c=='"')q=true;
-  else if(c==','){r.push(f);f=""}
-  else if(c=='\n'||c=='\r'){if(c=='\r'&&t[i+1]=='\n')i++;r.push(f);rows.push(r);r=[];f=""}
-  else f+=c}
- if(f!==""||r.length){r.push(f);rows.push(r)}
- var h=rows.shift()||[];
- return rows.filter(function(x){return x.some(function(y){return y!==""})}).map(function(x){var o={};h.forEach(function(k,i){o[k]=x[i]===undefined?"":x[i]});return o})}
-function loadSheet(){
- var base="https://docs.google.com/spreadsheets/d/"+SHEET_ID+"/gviz/tq?headers=1&tqx=out:csv&sheet=";
- return Promise.all(["Bookings","Legs"].map(function(t){return fetch(base+t+"&_="+Date.now()).then(function(r){if(!r.ok)throw new Error(r.status);return r.text()})}))
- .then(function(a){build(csv(a[0]),csv(a[1]),"Google Sheets (ข้อมูลสด)")})}
-function fallback(){try{load(XLSX.read(XL,{type:"base64"}),"ไฟล์ตัวอย่างในหน้า (เชื่อมต่อ Google Sheets ไม่ได้)")}catch(x){$("msg").innerHTML='<p class="err">โหลดข้อมูลไม่สำเร็จ</p>'}}
+var API="__API__"; /* วางลิงก์ Web app ของ Apps Script (ลงท้ายด้วย /exec) */
 var TH=["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
-function fd(v){if(typeof v==="number"){var d=new Date(Math.round((v-25569)*864e5));return d.getUTCDate()+" "+TH[d.getUTCMonth()]+" "+d.getUTCFullYear()}
- var m=String(v||"").match(/(\d{1,2})[\s\-\/]([A-Za-z]{3})[a-z]*[\s\-\/,]+(\d{4})/);
- if(m){var i="jan feb mar apr may jun jul aug sep oct nov dec".split(" ").indexOf(m[2].toLowerCase());if(i>=0)return (+m[1])+" "+TH[i]+" "+m[3]}
- return String(v||"")}
-function yes(v){return String(v).trim().toUpperCase()==="Y"?1:0}
-function load(wb,name){
- var sb=wb.Sheets["Bookings"],sl=wb.Sheets["Legs"];
- if(!sb||!sl){$("msg").innerHTML='<p class="err">ไฟล์ต้องมีชีตชื่อ Bookings และ Legs</p>';return}
- build(XLSX.utils.sheet_to_json(sb,{raw:true,defval:""}),XLSX.utils.sheet_to_json(sl,{raw:true,defval:""}),name);
-}
-function build(B,L,name){var out=[];
- B.forEach(function(b){
-  var bk=String(b["Booking No"]).trim();if(!bk)return;
-  var legs=L.filter(function(l){return String(l["Booking No"]).trim()===bk}).sort(function(x,y){return x["Leg"]-y["Leg"]});
-  if(!legs.length)return;
-  var ports=[legs[0]["From port"]].concat(legs.map(function(l){return l["To port"]}));
-  var pos=Math.max(0,Math.min(Number(String(b["Route position (0 = first port)"]).replace(",","."))||0,ports.length-1));
-  var note=String(b["Status note"]||""),seen=String(b["AIS last seen (Thai time)"]||"");
-  if(seen)note+=" (AIS last seen: "+seen+")";
-  out.push({bk:bk,co:String(b["Company"]),status:String(b["Status"]).trim().toLowerCase(),pos:pos,note:note,ports:ports,
-   legs:legs.map(function(l){return {v:String(l["Vessel"]),d:fd(l["ETD / ATD"]),da:yes(l["Departure confirmed (ATD)"]),a:fd(l["ETA / ATA"]),aa:yes(l["Arrival confirmed (ATA)"])}})});
- });
- DB=out;$("msg").innerHTML="";$("result").innerHTML="";
- $("src").textContent="แหล่งข้อมูล: "+name+" ("+out.length+" Booking)";
- $("demo").innerHTML="ลองข้อมูลตัวอย่าง:"+out.slice(0,4).map(function(r,i){return '<button type="button" data-i="'+i+'">'+esc(r.bk)+'</button>'}).join("");
-}
+var MON="jan feb mar apr may jun jul aug sep oct nov dec".split(" ");
 var $=function(i){return document.getElementById(i)};
-var norm=function(s){return s.toLowerCase().replace(/[\s\-_.,]/g,"")};
+var norm=function(s){return String(s).toLowerCase().replace(/[\s\-_.,()\/]/g,"")};
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
-function find(bk,vs,co){
- var hits=[];
- for(var i=0;i<DB.length;i++){var r=DB[i];
-  if(bk&&norm(r.bk)!==norm(bk))continue;
-  if(co&&norm(r.co).indexOf(norm(co))<0)continue;
-  if(vs&&!r.legs.some(function(l){return norm(l.v).indexOf(norm(vs))>=0}))continue;
-  hits.push(i);}
- if(!hits.length)return {e:"ไม่พบข้อมูลที่ตรงกับที่กรอก ตรวจสอบการสะกด หรือลองกรอกช่องอื่นแทน"};
- return {hits:hits};
-}
-function chart(r){
- var n=r.ports.length,W=760,H=170,x0=70,x1=W-70,pts=[];
- for(var i=0;i<n;i++)pts.push([x0+i*(x1-x0)/(n-1),i%2?70:100]);
- var k=Math.min(Math.floor(r.pos),n-2),t=r.pos-k;
- var m=[pts[k][0]+(pts[k+1][0]-pts[k][0])*t,pts[k][1]+(pts[k+1][1]-pts[k][1])*t];
- var done=pts.slice(0,k+1).concat([m]).map(function(p){return p.join(",")}).join(" ");
- var rest=[m].concat(pts.slice(k+1)).map(function(p){return p.join(",")}).join(" ");
- var g="";for(var gx=0;gx<=W;gx+=40)g+='<line x1="'+gx+'" y1="0" x2="'+gx+'" y2="'+H+'" />';
- for(var gy=0;gy<=H;gy+=40)g+='<line x1="0" y1="'+gy+'" x2="'+W+'" y2="'+gy+'" />';
- var s='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="เส้นทางเรือ"><g stroke="var(--grid)" stroke-width="1">'+g+'</g>';
- s+='<polyline points="'+rest+'" fill="none" stroke="var(--route)" stroke-width="2.5" stroke-dasharray="3 8" stroke-linecap="round"/>';
- s+='<polyline points="'+done+'" fill="none" stroke="var(--route)" stroke-width="4" stroke-linecap="round"/>';
- pts.forEach(function(p,i){
-  var reached=i<=r.pos+0.001;
-  s+='<circle cx="'+p[0]+'" cy="'+p[1]+'" r="7" fill="'+(reached?'var(--route)':'var(--paper)')+'" stroke="var(--route)" stroke-width="3"/>';
-  var ty=p[1]<85?p[1]-16:p[1]+28;
-  s+='<text x="'+p[0]+'" y="'+ty+'" text-anchor="middle" font-size="14" font-weight="500" fill="var(--ink)">'+esc(r.ports[i])+'</text>';});
- if(r.status==="dark"){
-  s+='<circle cx="'+m[0]+'" cy="'+m[1]+'" r="11" fill="var(--paper)" stroke="var(--amber)" stroke-width="3" stroke-dasharray="4 3"/><text x="'+m[0]+'" y="'+(m[1]+5)+'" text-anchor="middle" font-size="14" font-weight="600" fill="var(--amber)">?</text>';
- }else if(r.status==="transit"){
-  s+='<circle class="ping" cx="'+m[0]+'" cy="'+m[1]+'" r="9" fill="var(--amber)"/><circle cx="'+m[0]+'" cy="'+m[1]+'" r="9" fill="var(--amber)" stroke="var(--paper)" stroke-width="3"/>';
- }else{
-  s+='<rect x="'+(m[0]-9)+'" y="'+(m[1]-9)+'" width="18" height="18" rx="3" fill="var(--ok)" stroke="var(--paper)" stroke-width="3"/>';}
- return s+'</svg>';
-}
-function dt(d,act){return esc(d)+'<span class="tag'+(act?' ok':'')+'">'+(act?'confirm':'ประมาณการ')+'</span>'}
-function render(r,vs){
- var T={dark:["ไม่พบสัญญาณ AIS","เรืออาจปิดสัญญาณหรืออยู่นอกพื้นที่รับสัญญาณ"],docked:["เรือจอดที่ท่า",r.ports[Math.round(r.pos)]],transit:["เรืออยู่ระหว่างเดินทาง","ระหว่าง "+r.ports[Math.floor(r.pos)]+" และ "+r.ports[Math.ceil(r.pos)]]}[r.status];
- var cur=r.legs[Math.min(Math.floor(r.pos),r.legs.length-1)].v;
- var rows=r.legs.map(function(l,i){return '<tr><td>'+esc(l.v)+'</td><td>'+esc(r.ports[i])+' → '+esc(r.ports[i+1])+'</td><td>'+dt(l.d,l.da)+'</td><td>'+dt(l.a,l.aa)+'</td></tr>'}).join("");
- $("result").innerHTML='<div class="status '+r.status+'"><h2>'+T[0]+'</h2><p>'+esc(T[1])+'</p></div>'+
- '<div class="meta"><span>Booking <b>'+esc(r.bk)+'</b></span><span>บริษัท <b>'+esc(r.co)+'</b></span><span>เรือลำปัจจุบัน <b>'+esc(cur)+'</b></span></div>'+
- '<p style="margin:0 0 10px">'+esc(r.note)+'</p>'+
- '<div class="chart">'+chart(r)+'</div>'+
- '<div class="legs"><table><thead><tr><th>เรือ</th><th>เส้นทาง</th><th>ออกเดินทาง (ETD / ATD)</th><th>ถึงท่า (ETA / ATA)</th></tr></thead><tbody>'+rows+'</tbody></table></div>'+
- '<div class="remark"><b>หมายเหตุ:</b> ข้อมูลนี้ได้จากระบบติดตามเรือภายนอกและอาจไม่ถูกต้อง 100% กำหนดการอาจเปลี่ยนแปลงได้ กรุณายืนยันกับทีม CS ของ B.J. Interfreight ก่อนตัดสินใจเรื่องสำคัญ</div>';
- $("result").scrollIntoView({behavior:"smooth",block:"start"});
-}
-function run(){
- $("msg").innerHTML="";
- var bk=$("bk").value.trim(),vs=$("vs").value.trim(),co=$("co").value.trim();
- if(!bk&&!vs&&!co){$("result").innerHTML="";$("msg").innerHTML='<p class="err">กรอกอย่างน้อยหนึ่งช่อง ได้แก่ เลข Booking ชื่อเรือ หรือชื่อบริษัท</p>';return}
- var x=find(bk,vs,co);
- if(x.e){$("result").innerHTML="";$("msg").innerHTML='<p class="err">'+x.e+'</p>';return}
- if(x.hits.length===1){render(DB[x.hits[0]]);return}
- $("result").innerHTML='<p>พบ '+x.hits.length+' รายการ เลือกรายการที่ต้องการ</p>'+x.hits.map(function(j){var r=DB[j];return '<p><button type="button" class="pick" onclick="render(DB['+j+'])">'+esc(r.bk)+' · '+esc(r.co)+'</button></p>'}).join("");
-}
-$("f").addEventListener("submit",function(e){e.preventDefault();run()});
-$("demo").addEventListener("click",function(e){var t=e.target.closest("[data-i]");if(!t)return;
- var r=DB[+t.dataset.i];$("bk").value=r.bk;$("vs").value=r.legs[Math.min(Math.floor(r.pos),r.legs.length-1)].v;$("co").value=r.co;run()});
-$("upbtn").addEventListener("click",function(){$("xl").click()});
-$("xl").addEventListener("change",function(){var f=this.files[0];if(!f)return;var rd=new FileReader();
- rd.onload=function(){try{load(XLSX.read(new Uint8Array(rd.result),{type:"array"}),f.name)}catch(x){$("msg").innerHTML='<p class="err">อ่านไฟล์ไม่สำเร็จ ตรวจสอบว่าเป็นไฟล์ .xlsx</p>'}};rd.readAsArrayBuffer(f)});
-$("rf").addEventListener("click",function(){loadSheet().catch(function(){$("msg").innerHTML='<p class="err">เชื่อมต่อ Google Sheets ไม่ได้ ตรวจสอบว่าชีตแชร์แบบ "ทุกคนที่มีลิงก์ดูได้"</p>'})});
-loadSheet().catch(fallback);
+var NAV={1:"ทอดสมอ",5:"จอดเทียบท่า",2:"เรือไม่อยู่ในการควบคุม",3:"เคลื่อนที่จำกัด",6:"เกยตื้น"};
+function ago(ts){var m=Math.max(0,Math.round((Date.now()-ts*1000)/60000));
+ return m<1?"เมื่อสักครู่":m<60?m+" นาทีที่แล้ว":m<1440?Math.round(m/60)+" ชั่วโมงที่แล้ว":Math.round(m/1440)+" วันที่แล้ว"}
+function etaTxt(e){if(!e||!e.Month||!e.Day)return"";var p=function(n){return String(n).padStart(2,"0")};
+ return e.Day+" "+TH[e.Month-1]+(e.Hour<24?" "+p(e.Hour)+":"+p(e.Minute||0)+" UTC":"")}
+function card(l){var s=l.st||{},h='<div class="seg '+(s.found?"go":"")+'"><span class="v">'+esc(l.v)+'</span>';
+ if(!s.found){return h+'<p style="margin:6px 0 0;color:var(--mute)">'+(s.error?"ตอนนี้ดึงข้อมูลตำแหน่งไม่ได้ กรุณาลองใหม่ภายหลัง":"ยังไม่พบสัญญาณ AIS ของเรือลำนี้ (เรืออาจอยู่นอกพื้นที่รับสัญญาณ หรือเพิ่งเริ่มติดตาม)")+'</p></div>'}
+ var mv=s.nav in NAV?NAV[s.nav]:(s.sog!=null&&s.sog>=1?"กำลังแล่น":"แทบหยุดนิ่ง");
+ h+='<div class="row"><span>สถานะ: <b>'+mv+'</b>'+(s.sog!=null?" · "+s.sog.toFixed(1)+" นอต":"")+'</span>'+
+  '<span>ตำแหน่ง: <a href="https://www.google.com/maps?q='+s.lat+','+s.lon+'" target="_blank" rel="noopener">'+s.lat.toFixed(3)+', '+s.lon.toFixed(3)+'</a></span></div>';
+ var d=s.dest?'<span>ปลายทางที่เรือแจ้ง: <b>'+esc(s.dest)+'</b></span>':"",e=etaTxt(s.eta)?'<span>ETA ที่เรือแจ้ง: <b>'+esc(etaTxt(s.eta))+'</b></span>':"";
+ if(d||e)h+='<div class="row">'+d+e+'</div>';
+ var old=Date.now()/1000-s.ts>86400;
+ return h+'<div class="row"><span style="color:'+(old?"var(--err)":"var(--mute)")+'">อัปเดตล่าสุด '+ago(s.ts)+(old?" (ข้อมูลเก่า)":"")+'</span></div></div>'}
+function render(b){var h='<div class="status"><h2>เรือของ Booking นี้</h2><p>'+esc(b.legs.map(function(l){return l.v}).join(" → "))+'</p></div>';
+ h+='<div class="meta">Booking <b>'+esc(b.bk)+'</b>'+(b.cust?' · ลูกค้า <b>'+esc(b.cust)+'</b>':'')+'</div>';
+ b.legs.forEach(function(l){h+=card(l)});
+ h+='<div class="remark"><b>หมายเหตุ:</b> ตำแหน่งมาจากสัญญาณ AIS ที่เรือส่งออกมา ซึ่งอาจล่าช้า ขาดช่วง หรือไม่ถูกต้อง 100% ปลายทางและ ETA เป็นค่าที่ลูกเรือกรอก กรุณายืนยันกับทีม CS ของ B.J. Interfreight ก่อนตัดสินใจเรื่องสำคัญ</div>';
+ $("result").innerHTML=h;$("result").scrollIntoView({behavior:"smooth",block:"start"})}
+function showErr(m){$("result").innerHTML="";$("msg").innerHTML='<p class="err">'+m+'</p>'}
+var cd=null,NF="ไม่พบข้อมูล ตรวจสอบเลข Booking ให้ตรงกับเอกสาร หรือติดต่อทีม CS ของ B.J. Interfreight";
+function cooldown(){var n=5,go=$("go");$("result").innerHTML="";go.disabled=true;clearInterval(cd);
+ function tick(){$("msg").innerHTML='<p class="err">'+NF+'<br>โปรดลองใหม่อีกครั้งในอีก <b>'+n+'</b> วินาที</p>';go.textContent="ลองใหม่ได้ใน "+n+" วินาที"}
+ tick();cd=setInterval(function(){n--;
+  if(n<=0){clearInterval(cd);cd=null;go.disabled=false;go.textContent="ตรวจสอบสถานะ";$("msg").innerHTML='<p class="err">'+NF+'</p>'}else tick()},1000)}
+$("f").addEventListener("submit",function(e){e.preventDefault();if(cd)return;$("msg").innerHTML="";
+ var bk=$("bk").value.trim();
+ if(!bk){showErr("กรอกเลข Booking");return}
+ if(!API){showErr("ยังไม่ได้ตั้งค่าลิงก์ API ในไฟล์ index.html");return}
+ var go=$("go");go.disabled=true;go.textContent="กำลังตรวจสอบ...";
+ fetch(API+"?bk="+encodeURIComponent(bk)).then(function(r){return r.json()})
+ .then(function(j){
+  if(j.ok){render(j.b)}
+  else if(j.error==="busy")showErr("มีการค้นหาที่ไม่สำเร็จมากเกินไป กรุณาลองใหม่ในอีกสักครู่");
+  else if(j.error)showErr("ระบบขัดข้อง กรุณาลองใหม่ภายหลัง หรือติดต่อทีม CS");
+  else cooldown()})
+ .catch(function(){showErr("เชื่อมต่อระบบไม่ได้ กรุณาลองใหม่ภายหลัง")})
+ .then(function(){if(!cd){go.disabled=false;go.textContent="ตรวจสอบสถานะ"}})});
 </script>
 </body>
 </html>
