@@ -45,7 +45,7 @@ button{font:inherit;cursor:pointer}
 .tag.ok{border-color:var(--ok);color:var(--ok)}
 .seg a{color:var(--route);font-size:13px}
 .remark{margin-top:18px;padding:12px 16px;background:var(--amber-bg);border-left:6px solid var(--amber);font-size:14px}
-.seg{margin:8px 0}.seg p{font-size:14px}.seg a{color:var(--route)}
+.seg{margin:8px 0}.seg.found{border-left-color:var(--amber)}.seg p{font-size:14px}.seg a{color:var(--route)}
 </style>
 </head>
 <body>
@@ -72,7 +72,7 @@ function ago(ts){var m=Math.max(0,Math.round((Date.now()-ts*1000)/60000));
  return m<1?"เมื่อสักครู่":m<60?m+" นาทีที่แล้ว":m<1440?Math.round(m/60)+" ชั่วโมงที่แล้ว":Math.round(m/1440)+" วันที่แล้ว"}
 function etaTxt(e){if(!e||!e.Month||!e.Day)return"";var p=function(n){return String(n).padStart(2,"0")};
  return e.Day+" "+TH[e.Month-1]+(e.Hour<24?" "+p(e.Hour)+":"+p(e.Minute||0)+" UTC":"")}
-function card(l){var s=l.st||{},h='<div class="seg '+(s.found?"go":"")+'"><span class="v">'+esc(l.v)+'</span>';
+function card(l){var s=l.st||{},h='<div class="seg'+(s.found?" found":"")+'"><span class="v">'+esc(l.v)+'</span>';
  if(!s.found){return h+'<p style="margin:6px 0 0;color:var(--mute)">'+(s.error?"ตอนนี้ดึงข้อมูลตำแหน่งไม่ได้ กรุณาลองใหม่ภายหลัง":"ยังไม่พบสัญญาณ AIS ของเรือลำนี้ (เรืออาจอยู่นอกพื้นที่รับสัญญาณ หรือเพิ่งเริ่มติดตาม)")+'</p></div>'}
  var mv=s.nav in NAV?NAV[s.nav]:(s.sog!=null&&s.sog>=1?"กำลังแล่น":"แทบหยุดนิ่ง");
  h+='<div class="row"><span>สถานะ: <b>'+mv+'</b>'+(s.sog!=null?" · "+s.sog.toFixed(1)+" นอต":"")+'</span>'+
