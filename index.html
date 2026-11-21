@@ -79,7 +79,7 @@ var norm=function(s){return String(s).toLowerCase().replace(/[\s\-_.,()\/]/g,"")
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
 var NAV={1:"ทอดสมอ",5:"จอดเทียบท่า",2:"เรือไม่อยู่ในการควบคุม",3:"เคลื่อนที่จำกัด",6:"เกยตื้น"};
 function ago(ts){var m=Math.max(0,Math.round((Date.now()-ts*1000)/60000));
- return m<1?"เมื่อสักครู่":m<60?m+" นาทีที่แล้ว":m<1440?Math.round(m/60)+" ชั่วโมงที่แล้ว":Math.round(m/1440)+" วันที่แล้ว"}
+ return m<1?"เมื่อสักครู่":m<60?m+" นาทีที่แล้ว":Math.round(m/60)+" ชั่วโมงที่แล้ว"}
 function etaTxt(e){if(!e||!e.Month||!e.Day)return"";var p=function(n){return String(n).padStart(2,"0")};
  return e.Day+" "+TH[e.Month-1]+(e.Hour<24?" "+p(e.Hour)+":"+p(e.Minute||0)+" UTC":"")}
 var IC={wait:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path class="spin" d="M12 3a9 9 0 1 0 9 9"/></svg>',
@@ -99,7 +99,7 @@ function card(l,passed){var s=l.st||{},k=passed?"passed":kind(s),ico='<span clas
   var d=s.dest?'<span>ปลายทางที่เรือแจ้ง: <b>'+esc(s.dest)+'</b></span>':"",e=etaTxt(s.eta)?'<span>ETA ที่เรือแจ้ง: <b>'+esc(etaTxt(s.eta))+'</b></span>':"";
   if(d||e)b+='<div class="row">'+d+e+'</div>';
   var old=Date.now()/1000-s.ts>86400;
-  b+='<div class="row"><span style="color:'+(old?"var(--err)":"var(--mute)")+'">อัปเดตล่าสุด '+ago(s.ts)+(old?" (ข้อมูลเก่า)":"")+'</span></div>'}
+  b+='<div class="row"><span style="color:'+(old?"var(--err)":"var(--mute)")+'">อัปเดตล่าสุด '+ago(s.ts)+'</span></div>'}
  b+='</div>';
  return '<div class="seg '+k+'">'+(k==="arrived"||k==="passed"?ico+b:b+ico)+'</div>'}
 function render(b){var h='<div class="meta">Booking <b>'+esc(b.bk)+'</b></div>';
